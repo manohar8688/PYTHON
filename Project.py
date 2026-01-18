@@ -156,7 +156,7 @@ if st.button("📊 Compare All Candidates"):
         winners = df_compare[df_compare["Score"] == max_score]["Name"].tolist()
         st.success(f"🏆 Winner(s): {', '.join(winners)} with score {max_score}")
 
- if "confirm_clear" not in st.session_state:
+if "confirm_clear" not in st.session_state:
     st.session_state.confirm_clear = False
 
 if st.button("🧹 Clear All Data"):
