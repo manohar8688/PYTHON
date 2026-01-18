@@ -12,7 +12,8 @@ companies = {
     "MICROSOFT": ["python", "java", "datastructures", "cloud", "systemdesign", "linux"],
     "IBM": ["python", "sql", "cloud", "linux", "testing", "communication"],
     "DELOITTE": ["sql", "python", "cloud", "c", "communication", "testing"],
-    "CAPGEMINI": ["java", "python", "sql", "html", "css", "communication"]}
+    "CAPGEMINI": ["java", "python", "sql", "html", "css", "communication"]
+}
 
 skill_weights = {"python": 30, "java": 28, "sql": 25, "html": 10, "css": 8,
                  "datastructures": 30, "communication": 10, "cloud": 25,
@@ -31,7 +32,8 @@ skill_aliases = {
     "testing": ["qa", "manual testing", "automation testing"],
     "aiml": ["ai", "ml", "ai/ml", "artificial intelligence", "machine learning"],
     "systemdesign": ["system design", "low level design", "high level design"],
-    "c": ["c language"]}
+    "c": ["c language"]
+}
 
 Total_skill_weightage = sum(skill_weights.values())
 
@@ -50,9 +52,11 @@ if "candidates" not in st.session_state:
 st.set_page_config(page_title="Resume Analyzer")
 
 if st.sidebar.button("🔄 Upload New Resume"):
-    for key in ["name", "age", "resume_text", "uploaded_file", "option"]:
-        if key in st.session_state:
-            del st.session_state[key]
+    st.session_state["name"] = ""
+    st.session_state["age"] = 10
+    st.session_state["resume_text"] = ""
+    st.session_state["uploaded_file"] = None
+    st.session_state["option"] = "📝Enter Resume Text"
     st.rerun()
 
 st.title("📄Resume Analysis & Placement Recommendation System")
@@ -140,8 +144,6 @@ if st.button("🧐Analyze Resume"):
             else:
                 st.warning("Enter your name to save result for comparison")
 
-st.markdown("---")
-
 if st.button("📊 Compare All Candidates"):
     if len(st.session_state.candidates) == 0:
         st.warning("No candidates added yet.")
@@ -153,6 +155,7 @@ if st.button("📊 Compare All Candidates"):
         max_score = df_compare["Score"].max()
         winners = df_compare[df_compare["Score"] == max_score]["Name"].tolist()
         st.success(f"🏆 Winner(s): {', '.join(winners)} with score {max_score}")
+
 if st.button("🧹 Clear All Data"):
     if st.checkbox("⚠️ Confirm: This will delete ALL candidate data"):
         st.session_state.clear()
