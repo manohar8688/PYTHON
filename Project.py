@@ -15,9 +15,11 @@ companies = {
     "CAPGEMINI": ["java", "python", "sql", "html", "css", "communication"]
 }
 
-skill_weights = {"python": 30, "java": 28, "sql": 25, "html": 10, "css": 8,
-                 "datastructures": 30, "communication": 10, "cloud": 25,
-                 "linux": 20, "testing": 12, "aiml": 22, "systemdesign": 26, "c": 20}
+skill_weights = {
+    "python": 30, "java": 28, "sql": 25, "html": 10, "css": 8,
+    "datastructures": 30, "communication": 10, "cloud": 25,
+    "linux": 20, "testing": 12, "aiml": 22, "systemdesign": 26, "c": 20
+}
 
 skill_aliases = {
     "python": ["py", "python3"],
@@ -49,20 +51,21 @@ def skill_found(skill, full_text, tokens):
 if "candidates" not in st.session_state:
     st.session_state.candidates = []
 
+if "form_id" not in st.session_state:
+    st.session_state.form_id = 0
+
 st.set_page_config(page_title="Resume Analyzer")
 
 if st.sidebar.button("🔄 Upload New Resume"):
-    st.session_state["name"] = ""
-    st.session_state["age"] = 10
-    st.session_state["resume_text"] = ""
-    st.session_state["uploaded_file"] = None
-    st.session_state["option"] = "📝Enter Resume Text"
+    st.session_state.form_id += 1
     st.rerun()
+
+fid = st.session_state.form_id
 
 st.title("📄Resume Analysis & Placement Recommendation System")
 
-name = st.text_input("👤 Enter your name", key="name")
-age = st.number_input("👤Enter your age", min_value=10, max_value=60, key="age")
+name = st.text_input("👤 Enter your name", key=f"name_{fid}")
+age = st.number_input("👤Enter your age", min_value=10, max_value=60, key=f"age_{fid}")
 
 if age < 18 or age > 26:
     st.error("❌You are not eligible for job roles based on age.")
@@ -73,13 +76,13 @@ else:
 resume_text = ""
 st.subheader("📄Upload Resume")
 opts = ["📝Enter Resume Text", "📁Upload PDF Resume"]
-option = st.radio("Choose input type:", opts, key="option")
+option = st.radio("Choose input type:", opts, key=f"option_{fid}")
 
 if option == "📝Enter Resume Text":
-    resume_text = st.text_area("Paste your resume text here", height=200, key="resume_text")
+    resume_text = st.text_area("Paste your resume text here", height=200, key=f"resume_text_{fid}")
 
 elif option == "📁Upload PDF Resume":
-    uploaded_file = st.file_uploader("Upload PDF", type=["pdf"], key="uploaded_file")
+    uploaded_file = st.file_uploader("Upload PDF", type=["pdf"], key=f"uploaded_file_{fid}")
     if uploaded_file:
         try:
             doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
@@ -118,10 +121,9 @@ if st.button("🧐Analyze Resume"):
             st.error("😥You do not have enough skills for these companies.")
             st.write("Companies:", list(companies.keys()))
         else:
-            st.subheader("Company-wise Score and Missing Skills")
             ranked_score = sorted(companies_score.items(), key=lambda x: x[1], reverse=True)
-
             result_data = []
+
             for company, score in ranked_score:
                 missing_skills = []
                 for req in companies[company]:
@@ -138,31 +140,22 @@ if st.button("🧐Analyze Resume"):
             strength = (best_score / Total_skill_weightage * 100)
             st.write("💪Resume strength : ", strength, "%")
 
-            if name.strip() != "":
+            if name.strip():
                 st.session_state.candidates.append({"Name": name, "Best Company": ", ".join(best_companies), "Score": best_score})
                 st.success("Candidate saved for comparison")
             else:
                 st.warning("Enter your name to save result for comparison")
 
 if st.button("📊 Compare All Candidates"):
-    if len(st.session_state.candidates) == 0:
+    if not st.session_state.candidates:
         st.warning("No candidates added yet.")
     else:
         df_compare = pd.DataFrame(st.session_state.candidates)
-        st.subheader("All Candidates Comparison")
         st.dataframe(df_compare, use_container_width=True)
-
         max_score = df_compare["Score"].max()
         winners = df_compare[df_compare["Score"] == max_score]["Name"].tolist()
         st.success(f"🏆 Winner(s): {', '.join(winners)} with score {max_score}")
 
-if "confirm_clear" not in st.session_state:
-    st.session_state.confirm_clear = False
-
 if st.button("🧹 Clear All Data"):
-    st.session_state.confirm_clear = True
-
-if st.session_state.confirm_clear:
-    if st.button("⚠️ Confirm Delete Everything"):
-        st.session_state.clear()
-        st.rerun()
+    st.session_state.clear()
+    st.rerun()
