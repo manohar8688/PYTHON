@@ -1,6 +1,6 @@
 import streamlit as st
 import fitz  # PyMuPDF
-
+#----------------
 # ------------------ DATA (UNCHANGED CORE LOGIC) ------------------
 
 companies = {
