@@ -126,10 +126,13 @@ if st.button("🧐Analyze Resume"):
 
             for company, score in ranked_score:
                 missing_skills = []
+                matched_skills=[]
                 for req in companies[company]:
-                    if not skill_found(req, user_input, clean_resume):
+                    if skill_found(req, user_input, clean_resume):
+                        matched_skills.append(req)
+                    else:
                         missing_skills.append(req)
-                result_data.append({"Company": company, "Score": score, "Missing skills": ",".join(missing_skills)})
+                result_data.append({"Company": company, "Score": score,"matched skills": ",".join(matched_skills), "Missing skills": ",".join(missing_skills)})
 
             df = pd.DataFrame(result_data)
             st.dataframe(df, use_container_width=True)
