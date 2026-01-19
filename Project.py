@@ -162,9 +162,10 @@ if st.button("📊 Compare All Candidates"):
 if "confirm_clear" not in st.session_state:
     st.session_state.confirm_clear = False
 
-confirm = st.checkbox("⚠️ Confirm: Delete all data",key="confirm_clear")
+confirm = st.checkbox("⚠️ Confirm: Delete all data", key="confirm_clear")
 
 if st.button("🧹 Clear All Data") and confirm:
+    next_id = st.session_state.form_id + 1
     st.session_state.clear()
-    st.session_state.form_id = 0
+    st.session_state.form_id = next_id
     st.rerun()
